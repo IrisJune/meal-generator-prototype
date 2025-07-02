@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspen Meal Planner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Aspen Meal Generator</h1>
+
+        <div class="input-section">
+            <label for="mealType">Select Meal/Snack Type:</label>
+            <select id="mealType">
+                <option value="Breakfast">Breakfast</option>
+                <option value="Morning Snack">Morning Snack</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Afternoon Snack">Afternoon Snack</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Evening Snack">Evening Snack</option>
+            </select>
+            <button onclick="generateMeal()">Generate Meal</button>
+        </div>
+
+        <div class="meal-output">
+            <h2>Your Generated Meal:</h2>
+            <div id="generatedMealContent">
+                <p>Select a meal type and click "Generate Meal" to see your meal plan.</p>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <p>This app is for meal generation purposes based on a predefined list. For specific dietary needs or health concerns, please consult with a qualified healthcare professional.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
