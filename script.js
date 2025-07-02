@@ -45,7 +45,7 @@ const foodList = [
     { Item: "Cucumber", Category: "Fruit/Veg", Breakfast: false, MorningSnack: true, Lunch: true, AfternoonSnack: true, Dinner: false, EveningSnack: false },
     { Item: "Snap Pea", Category: "Fruit/Veg", Breakfast: false, MorningSnack: true, Lunch: true, AfternoonSnack: true, Dinner: false, EveningSnack: false },
     { Item: "Roasted Chickpeas", Category: "Protein", Breakfast: false, MorningSnack: false, Lunch: true, AfternoonSnack: true, Dinner: false, EveningSnack: false }
-[cite_start]]; [cite: 1]
+];
 
 // --- Helper Functions (Adapted from Google Apps Script) ---
 
@@ -56,9 +56,9 @@ const foodList = [
  */
 function getRandomItem(arr) {
     if (arr.length === 0) {
-        return ''; [cite_start]// Return empty if no options [cite: 15]
+        return ''; // Return empty if no options
     }
-    [cite_start]return arr[Math.floor(Math.random() * arr.length)]; [cite: 17]
+    return arr[Math.floor(Math.random() * arr.length)];
 }
 
 /**
@@ -73,28 +73,26 @@ function generateMealItems(selectedMealType, foodList) {
         'Fruit/Veg': [],
         'Grain/Starch': [],
         'Drink': []
-    [cite_start]}; [cite: 63]
-    [cite_start]const categorizedItemsAll = { // New: stores all valid items for the meal, regardless of daily uniqueness [cite: 64]
+    };
+    const categorizedItemsAll = {
         'Protein': [],
         'Fruit/Veg': [],
         'Grain/Starch': [],
         'Drink': []
-    [cite_start]}; [cite: 64]
+    };
 
     // Iterate through the food list to find applicable items
-    [cite_start]foodList.forEach(row => { [cite: 65]
-        const itemName = row.Item; [cite_start]// Column A: Item Name [cite: 65]
-        const category = row.Category; [cite_start]// Column B: Category [cite: 66]
+    foodList.forEach(row => {
+        const itemName = row.Item;
+        const category = row.Category;
 
-        // Check if item is applicable to this meal type using the dynamically accessed property
-        [cite_start]if (row[selectedMealType] === true) { // [cite: 66]
+        // FIX: Use bracket notation to access the property dynamically based on selectedMealType
+        if (row[selectedMealType] === true) {
             if (categorizedItemsAll[category]) {
-                categorizedItemsAll[category].push(itemName); [cite_start]// Add to 'all' list [cite: 67]
-                // For a standalone daily generator, we don't need `excludedItems`
-                // But keeping the structure similar to the Apps Script for future expansion
-                categorizedItemsUnique[category].push(itemName); // For daily, unique is all applicable
+                categorizedItemsAll[category].push(itemName);
+                categorizedItemsUnique[category].push(itemName);
             } else {
-                [cite_start]console.warn(`Item "${itemName}" has an unrecognized category: "${category}". Skipping.`); [cite: 69]
+                console.warn(`Item "${itemName}" has an unrecognized category: "${category}". Skipping.`);
             }
         }
     });
@@ -104,77 +102,74 @@ function generateMealItems(selectedMealType, foodList) {
         grainStarch: '',
         fruitVeg: '',
         protein: ''
-    [cite_start]}; [cite: 70]
+    };
 
     // Helper function to pick a random item from a filtered array, with fallback to all items
     const pickRandomWithFallback = (categoryName, targetProp) => {
-        [cite_start]let item = getRandomItem(categorizedItemsUnique[categoryName]); [cite: 71]
-        [cite_start]// If no unique items are available, try picking from all applicable items for this meal. [cite: 72]
+        let item = getRandomItem(categorizedItemsUnique[categoryName]);
         if (!item && categorizedItemsAll[categoryName].length > 0) {
-            [cite_start]item = getRandomItem(categorizedItemsAll[categoryName]); [cite: 73]
+            item = getRandomItem(categorizedItemsAll[categoryName]);
         }
-        // If still no item, it means there are truly no options checked for this category/meal
         if (item) {
-            [cite_start]result[targetProp] = item; [cite: 74]
+            result[targetProp] = item;
         } else {
-            [cite_start]result[targetProp] = `No ${categoryName} options checked for ${selectedMealType}.`; [cite: 75]
+            result[targetProp] = `No ${categoryName} options checked for ${selectedMealType}.`;
         }
     };
 
-    [cite_start]// Drink (Breakfast & Lunch only) [cite: 76]
+    // Drink (Breakfast & Lunch only)
     if (selectedMealType === "Breakfast" || selectedMealType === "Lunch") {
-        [cite_start]pickRandomWithFallback('Drink', 'drink'); [cite: 76]
+        pickRandomWithFallback('Drink', 'drink');
     }
 
-    [cite_start]// Grain/Starch (all meals) [cite: 76]
+    // Grain/Starch (all meals)
     pickRandomWithFallback('Grain/Starch', 'grainStarch');
 
-    [cite_start]// Fruit/Veg and Protein logic [cite: 77]
+    // Fruit/Veg and Protein logic
     if (selectedMealType === "Breakfast" || selectedMealType === "Lunch" || selectedMealType === "Dinner") {
-        [cite_start]// Breakfast, Lunch, Dinner need both Fruit/Veg and Protein [cite: 77]
-        [cite_start]pickRandomWithFallback('Fruit/Veg', 'fruitVeg'); [cite: 77]
-        [cite_start]pickRandomWithFallback('Protein', 'protein'); [cite: 77]
-    [cite_start]} else { // Snacks (Morning, Afternoon, Evening) [cite: 78]
-        [cite_start]// Snacks need one of either Fruit/Veg or Protein, in addition to Grain/Starch [cite: 78]
-        [cite_start]const availableSnackUniqueOptions = []; [cite: 78]
+        // Breakfast, Lunch, Dinner need both Fruit/Veg and Protein
+        pickRandomWithFallback('Fruit/Veg', 'fruitVeg');
+        pickRandomWithFallback('Protein', 'protein');
+    } else { // Snacks (Morning, Afternoon, Evening)
+        // Snacks need one of either Fruit/Veg or Protein, in addition to Grain/Starch
+        const availableSnackUniqueOptions = [];
         if (categorizedItemsUnique['Fruit/Veg'].length > 0) {
-            [cite_start]availableSnackUniqueOptions.push('Fruit/Veg'); [cite: 79]
+            availableSnackUniqueOptions.push('Fruit/Veg');
         }
         if (categorizedItemsUnique['Protein'].length > 0) {
-            [cite_start]availableSnackUniqueOptions.push('Protein'); [cite: 80]
+            availableSnackUniqueOptions.push('Protein');
         }
 
         if (availableSnackUniqueOptions.length > 0) {
-            [cite_start]const chosenCategory = getRandomItem(availableSnackUniqueOptions); [cite: 81]
+            const chosenCategory = getRandomItem(availableSnackUniqueOptions);
             if (chosenCategory === 'Fruit/Veg') {
-                [cite_start]pickRandomWithFallback('Fruit/Veg', 'fruitVeg'); [cite: 82]
-            } else { // chosenCategory === 'Protein'
-                [cite_start]pickRandomWithFallback('Protein', 'protein'); [cite: 83]
+                pickRandomWithFallback('Fruit/Veg', 'fruitVeg');
+            } else {
+                pickRandomWithFallback('Protein', 'protein');
             }
         } else {
-            [cite_start]// If no unique snack options, try picking from all applicable snack options (allowing repeats) [cite: 84]
-            [cite_start]const availableSnackAllOptions = []; [cite: 84]
+            const availableSnackAllOptions = [];
             if (categorizedItemsAll['Fruit/Veg'].length > 0) {
-                [cite_start]availableSnackAllOptions.push('Fruit/Veg'); [cite: 85]
+                availableSnackAllOptions.push('Fruit/Veg');
             }
             if (categorizedItemsAll['Protein'].length > 0) {
-                [cite_start]availableSnackAllOptions.push('Protein'); [cite: 86]
+                availableSnackAllOptions.push('Protein');
             }
 
             if (availableSnackAllOptions.length > 0) {
-                [cite_start]const chosenCategory = getRandomItem(availableSnackAllOptions); [cite: 87]
+                const chosenCategory = getRandomItem(availableSnackAllOptions);
                 if (chosenCategory === 'Fruit/Veg') {
-                    [cite_start]pickRandomWithFallback('Fruit/Veg', 'fruitVeg'); [cite: 88]
+                    pickRandomWithFallback('Fruit/Veg', 'fruitVeg');
                 } else {
-                    [cite_start]pickRandomWithFallback('Protein', 'protein'); [cite: 89]
+                    pickRandomWithFallback('Protein', 'protein');
                 }
             } else {
-                [cite_start]result.fruitVeg = `No Fruit/Veg or Protein options checked for ${selectedMealType}.`; [cite: 90]
-                result.protein = ''; [cite_start]// Ensure protein is empty if no snack options at all [cite: 90]
+                result.fruitVeg = `No Fruit/Veg or Protein options checked for ${selectedMealType}.`;
+                result.protein = '';
             }
         }
     }
-    [cite_start]return result; [cite: 91]
+    return result;
 }
 
 /**
